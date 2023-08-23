@@ -1,0 +1,4 @@
+name: OverCube
+version: '${project.version}'
+main: fr.owtfox.overcube.OverCube
+api-version: '1.19'
