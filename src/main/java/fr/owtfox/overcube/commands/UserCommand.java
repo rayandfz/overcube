@@ -9,8 +9,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.permissions.PermissionAttachment;
 import org.bukkit.plugin.Plugin;
 
-import java.util.Objects;
-
 public class UserCommand {
     private final User user;
     private final Plugin plugin;
@@ -31,7 +29,7 @@ public class UserCommand {
     public void ungrant(@Sender  CommandSender commandSender, Player player) {
         if (commandSender.isOp()) {
             user.ungrantUser(player.getName());
-            PermissionAttachment attachment = player.addAttachment(plugin);
+            final PermissionAttachment attachment = player.addAttachment(plugin);
             attachment.unsetPermission("overcube.is_over_cube");
             commandSender.sendMessage("The player has lost his privileges");
         }
