@@ -19,11 +19,11 @@ public class User {
         final Document suspectUserAlreadyExist = users.find(new Document("name", targetPlayerName)).first();
 
         if (suspectUserAlreadyExist == null) {
-            Document newSuspectUser = new Document("name", targetPlayerName).append("report", 1);
+            final Document newSuspectUser = new Document("name", targetPlayerName).append("report", 1);
             users.insertOne(newSuspectUser);
         } else {
-            int currentReports = suspectUserAlreadyExist.getInteger("report", 0);
-            int updatedReports = currentReports + 1;
+            final int currentReports = suspectUserAlreadyExist.getInteger("report", 0);
+            final int updatedReports = currentReports + 1;
             users.updateOne(
                     Filters.eq("name", targetPlayerName),
                     new Document("$set", new Document("report", updatedReports))
@@ -35,10 +35,10 @@ public class User {
         final Document userExist = users.find(new Document("name", targetPlayerName)).first();
 
         if (userExist == null) {
-            Document user = new Document("name", targetPlayerName).append("is_over_cube", true);
+            final Document user = new Document("name", targetPlayerName).append("is_over_cube", true);
             users.insertOne(user);
         } else {
-            boolean isOverCube = userExist.getBoolean("is_over_cube", false);
+            final boolean isOverCube = userExist.getBoolean("is_over_cube", false);
             if (!isOverCube) {
                 users.updateOne(
                         Filters.eq("name", targetPlayerName),
@@ -52,7 +52,7 @@ public class User {
         final Document userExist = users.find(new Document("name", targetPlayerName)).first();
 
         if (userExist != null) {
-            boolean userIsGrant = userExist.getBoolean("is_over_cube", false);
+            final boolean userIsGrant = userExist.getBoolean("is_over_cube", false);
             if (userIsGrant) {
                 users.updateOne(
                         Filters.eq("name", targetPlayerName),
