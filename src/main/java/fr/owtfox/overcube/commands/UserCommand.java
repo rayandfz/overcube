@@ -3,17 +3,19 @@ package fr.owtfox.overcube.commands;
 import com.jonahseguin.drink.annotation.Command;
 import com.jonahseguin.drink.annotation.Sender;
 import fr.owtfox.overcube.models.IUserRepository;
-import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.permissions.PermissionAttachment;
 import org.bukkit.plugin.Plugin;
+import java.util.HashMap;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 public class UserCommand {
     private final IUserRepository repository;
     private final Plugin plugin;
+    private HashMap<UUID, List<UUID>> reportUsers = new HashMap<>();
 
     public UserCommand(IUserRepository repository, Plugin plugin) {
         this.repository = repository;
@@ -21,10 +23,21 @@ public class UserCommand {
     }
 
     @Command(name = "report", desc = "", usage = "<playerName>")
-    public void report(@Sender  CommandSender commandSender, Player player) {
-        repository
-            .giveReport(player.getUniqueId())
-            .thenRun(() -> commandSender.sendMessage("The player has been reported"));
+    public void report(@Sender Player commandSender, Player player) {
+        UUID playerUUID = player.getUniqueId();
+        UUID senderUUID = commandSender.getUniqueId();
+        List<UUID> reportedBy = reportUsers.computeIfAbsent(playerUUID, k -> new ArrayList<>());
+
+        if (reportedBy.contains(senderUUID)) {
+            commandSender.sendMessage("You have already reported this player.");
+            return;
+        }
+
+        repository.giveReport(playerUUID)
+                .thenRun(() -> {
+                    reportedBy.add(senderUUID);
+                    commandSender.sendMessage("The player has been reported.");
+                });
     }
 
     @Command(name = "ungrant", desc = "", usage = "<playerName>")
