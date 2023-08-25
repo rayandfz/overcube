@@ -69,11 +69,10 @@
     </repositories>
 
     <dependencies>
-
         <dependency>
-            <groupId>org.mongodb</groupId>
-            <artifactId>mongodb-driver-sync</artifactId>
-            <version>4.10.2</version>
+            <groupId>com.github.jasync-sql</groupId>
+            <artifactId>jasync-postgresql</artifactId>
+            <version>2.2.0</version>
         </dependency>
         <dependency>
             <groupId>org.spigotmc</groupId>
