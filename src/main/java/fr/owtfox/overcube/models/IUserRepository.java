@@ -14,7 +14,11 @@ public interface IUserRepository {
 
     CompletableFuture<Collection<User>> getOverCubeUsers();
 
+    CompletableFuture<Boolean> getOverCubeReady(UUID uuid);
+
     CompletableFuture<Integer> getReportCount(UUID uuid);
+
+    CompletableFuture<Boolean> getPermission(UUID uuid);
 
     CompletableFuture<Void> giveReport(UUID uuid);
 
@@ -27,6 +31,8 @@ public interface IUserRepository {
     default CompletableFuture<Void> setPermission(User user, boolean allowed) {
         return setPermission(user.getUUID(), allowed);
     }
+
+    CompletableFuture<Void> setOverCubeReady(UUID uuid, boolean allowed);
 
     CompletableFuture<Collection<User>> getSpottedUsers();
 

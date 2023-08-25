@@ -31,6 +31,6 @@ public final class OverCube extends JavaPlugin {
         drink.registerCommands();
 
         BukkitScheduler scheduler = getServer().getScheduler();
-        scheduler.runTaskTimer(this, new KeArbing(repository), 0, 20 * 10);
+        scheduler.runTaskTimer(this, new KeArbing(repository, this), 0, 20 * 10);
     }
 }

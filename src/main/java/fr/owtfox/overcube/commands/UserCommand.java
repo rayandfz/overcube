@@ -3,10 +3,13 @@ package fr.owtfox.overcube.commands;
 import com.jonahseguin.drink.annotation.Command;
 import com.jonahseguin.drink.annotation.Sender;
 import fr.owtfox.overcube.models.IUserRepository;
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.PermissionAttachment;
 import org.bukkit.plugin.Plugin;
+
+import java.util.UUID;
 
 public class UserCommand {
     private final IUserRepository repository;
@@ -26,26 +29,35 @@ public class UserCommand {
 
     @Command(name = "ungrant", desc = "", usage = "<playerName>")
     public void ungrant(@Sender  CommandSender commandSender, Player player) {
-        if (commandSender.isOp()) {
-            repository.setPermission(player.getUniqueId(), false).thenRun(() -> {
-                final PermissionAttachment attachment = player.addAttachment(plugin);
-                attachment.unsetPermission("overcube.is_over_cube");
-                commandSender.sendMessage("The player has lost his privileges");
-            });
-        }
+        if (commandSender.isOp())
+            repository.setPermission(player.getUniqueId(), false).thenRun(() -> commandSender.sendMessage("The player has lost his privileges"));
 
         commandSender.sendMessage("You don't have permission for execute this command.");
     }
 
     @Command(name = "grant", desc = "", usage = "<playerName>")
     public void grant(@Sender CommandSender commandSender, Player player) {
-        if (commandSender.isOp()) {
-            repository.setPermission(player.getUniqueId(), true).thenRun(() -> {
-                player.addAttachment(plugin, "overcube.is_over_cube", true);
-                commandSender.sendMessage("The player has received the privileges");
-            });
-        }
+        if (commandSender.isOp())
+            repository.setPermission(player.getUniqueId(), true).thenRun(() -> commandSender.sendMessage("The player has received the privileges"));
 
         commandSender.sendMessage("You don't have permission for execute this command.");
+    }
+
+    @Command(name = "ready", desc = "", usage = "/ready")
+    public void ready(@Sender Player commandSender) {
+        final UUID uuid = commandSender.getUniqueId();
+
+        final boolean hasPermission = repository.getPermission(uuid).join();
+
+        if (!hasPermission) {
+            commandSender.sendMessage("You don't have permission for this");
+            return;
+        }
+
+        final boolean overCubeReady = repository.getOverCubeReady(uuid).join();
+
+        repository.setOverCubeReady(uuid, !overCubeReady);
+
+        commandSender.sendMessage("Overcube ready is " + !overCubeReady);
     }
 }

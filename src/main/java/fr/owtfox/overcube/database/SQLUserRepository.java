@@ -1,7 +1,6 @@
 package fr.owtfox.overcube.database;
 
 import com.github.jasync.sql.db.Connection;
-import com.github.jasync.sql.db.QueryResult;
 import com.github.jasync.sql.db.RowData;
 import com.github.jasync.sql.db.postgresql.PostgreSQLConnectionBuilder;
 import fr.owtfox.overcube.models.IUserRepository;
@@ -28,18 +27,27 @@ public class SQLUserRepository implements IUserRepository {
             (UUID) row.get("uuid"),
             row.getInt("report"),
             row.getBoolean("is_over_cube"),
-            row.getInt("overcube_count")
+            row.getInt("overcube_count"),
+            row.getBoolean("overcube_ready")
         );
+    }
+
+    @Override
+    public CompletableFuture<Boolean> getPermission(UUID uuid) {
+        return databaseConnection
+                .sendPreparedStatement("SELECT is_over_cube FROM users WHERE uuid = ?", singletonList(uuid))
+                .thenApply(result -> result.getRows().get(0).getBoolean("is_over_cube"));
     }
 
     @Override
     public CompletableFuture<Void> addUser(User user) {
         return databaseConnection
-                .sendPreparedStatement("INSERT INTO users VALUES (?, ?, ?, ?)", asList(
+                .sendPreparedStatement("INSERT INTO users VALUES (?, ?, ?, ?, ?)", asList(
                         user.getUUID(),
                         user.getReportCount(),
                         user.isOverCube(),
-                        user.getOverCubeCount()
+                        user.getOverCubeCount(),
+                        user.getOverCubeReady()
                 ))
                 .thenRun(DO_NOTHING);
     }
@@ -113,6 +121,20 @@ public class SQLUserRepository implements IUserRepository {
         return databaseConnection
             .sendPreparedStatement("SELECT overcube_count FROM users WHERE uuid = ?", singletonList(uuid))
             .thenApply(result -> result.getRows().get(0).getInt("overcube_count"));
+    }
+
+    @Override
+    public CompletableFuture<Boolean> getOverCubeReady(UUID uuid) {
+        return databaseConnection
+                .sendPreparedStatement("SELECT overcube_ready FROM users WHERE uuid = ?", singletonList(uuid))
+                .thenApply(result -> result.getRows().get(0).getBoolean("overcube_ready"));
+    }
+
+    @Override
+    public CompletableFuture<Void> setOverCubeReady(UUID uuid, boolean allowed) {
+        return databaseConnection
+                .sendPreparedStatement("UPDATE users SET overcube_ready = ? WHERE uuid = ?", asList(allowed, uuid))
+                .thenRun(DO_NOTHING);
     }
 
     private static final Runnable DO_NOTHING = () -> {};
