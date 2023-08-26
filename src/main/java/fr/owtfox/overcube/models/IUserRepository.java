@@ -1,6 +1,7 @@
 package fr.owtfox.overcube.models;
 
 import java.util.Collection;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
@@ -16,7 +17,7 @@ public interface IUserRepository {
     CompletableFuture<Integer> getOverCubeCount(UUID uuid);
     CompletableFuture<Boolean> getOverCubeReady(UUID uuid);
 
-    CompletableFuture<User> getSingleSpottedUser(UUID uuid);
+    CompletableFuture<Optional<User>> getSingleSpottedUser(UUID uuid);
 
     CompletableFuture<Collection<User>> getSpottedUser();
 

@@ -14,34 +14,15 @@ public class UserManager {
     private final IUserRepository repository;
     private final Plugin plugin;
     private final HashMap<UUID, List<UUID>> reportUsers = new HashMap<>();
-    private final OverModeRunnable overModeRunnable;
+    private final OverModeManager overModeManager;
 
 
     public UserManager(IUserRepository repository, Plugin plugin) {
         this.repository = repository;
         this.plugin = plugin;
-        this.overModeRunnable = new OverModeRunnable();
-        this.overModeRunnable.runTaskTimer(plugin, 0L, 20L);
+        this.overModeManager = new OverModeManager(repository, plugin);
     }
 
-    private User findOverCubeUser() {
-        Collection<User> overCubeUsers = repository.getOverCubeUsers().join();
-
-        for (User user : overCubeUsers) {
-            Player overcubePlayer = Bukkit.getPlayer(user.getUUID());
-            if (overcubePlayer != null && overcubePlayer.isOnline() && user.getOverCubeReady()) {
-                return user;
-            }
-        }
-
-        return null;
-    }
-
-    private void launchInspector(User spottedUser) {
-        User overUser = findOverCubeUser();
-        assert overUser != null;
-        this.overModeRunnable.pushInspect(Bukkit.getPlayer(overUser.getUUID()), Bukkit.getPlayer(spottedUser.getUUID()));
-    }
 
     public void report(Player commandSender, Player player) {
         final UUID playerUUID = player.getUniqueId();
@@ -54,22 +35,21 @@ public class UserManager {
             return;
         }
 
-        final User userHasMaxReport = repository.getSingleSpottedUser(playerUUID).join();
+        final Optional<User> userHasMaxReport = repository.getSingleSpottedUser(playerUUID).join();
 
-        if (userHasMaxReport != null) {
-            int overNumber = userHasMaxReport.getOverCubeCount();
+        userHasMaxReport.ifPresent(user -> {
+            int overNumber = user.getOverCubeCount();
 
-            launchInspector(userHasMaxReport);
+            if (overNumber < 5)
+                this.overModeManager.launch(user);
 
-            return;
-        }
+        });
 
         repository.giveReport(playerUUID)
                 .thenRun(() -> {
                     reportedBy.add(senderUUID);
                     commandSender.sendMessage("The player has been reported.");
                 });
-
     }
 
     public void ungrant(CommandSender commandSender, Player player) {

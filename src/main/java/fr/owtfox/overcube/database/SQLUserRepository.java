@@ -7,6 +7,7 @@ import fr.owtfox.overcube.models.IUserRepository;
 import fr.owtfox.overcube.models.User;
 
 import java.util.Collection;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
@@ -105,14 +106,13 @@ public class SQLUserRepository implements IUserRepository {
     }
 
     @Override
-    public CompletableFuture<User> getSingleSpottedUser(UUID uuid) {
+    public CompletableFuture<Optional<User>> getSingleSpottedUser(UUID uuid) {
         return databaseConnection
                 .sendPreparedStatement("SELECT * FROM users WHERE report >= 5 AND uuid = ?", singletonList(uuid))
                 .thenApply(result -> result.getRows()
                         .stream()
                         .map(this::parseUserRow)
                         .findFirst()
-                        .orElse(null)
                 );
     }
 
