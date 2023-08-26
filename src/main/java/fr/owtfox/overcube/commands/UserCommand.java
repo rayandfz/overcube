@@ -15,22 +15,22 @@ public class UserCommand {
         userManager = new UserManager(repository, plugin);
     }
 
-    @Command(name = "report", desc = "", usage = "<playerName>")
+    @Command(name = "report", desc = "Command to report a player", usage = "<playerName>")
     public void report(@Sender Player commandSender, Player player) {
         userManager.report(commandSender, player);
     }
 
-    @Command(name = "ungrant", desc = "", usage = "<playerName>")
+    @Command(name = "ungrant", desc = "Command to increase a player's privileges (be overcube user)", usage = "<playerName>")
     public void ungrant(@Sender CommandSender commandSender, Player player) {
         userManager.ungrant(commandSender, player);
     }
 
-    @Command(name = "grant", desc = "", usage = "<playerName>")
+    @Command(name = "grant", desc = "Remove player privileges", usage = "<playerName>")
     public void grant(@Sender CommandSender commandSender, Player player) {
        userManager.grant(commandSender, player);
     }
 
-    @Command(name = "ready", desc = "", usage = "/ready")
+    @Command(name = "ready", desc = "Ready for overcube", usage = "/ready")
     public void ready(@Sender Player commandSender) {
         userManager.ready(commandSender);
     }

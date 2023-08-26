@@ -4,9 +4,9 @@ main: fr.owtfox.overcube.OverCube
 api-version: '1.19'
 commands:
   report:
-    description: The command to report a player
+    description: Command to report a player
   grant:
-    description: Commande pour conferer la permission a un joueur de devenir overcube
+    description: Command to increase a player's privileges (be overcube user)
   ungrant:
     description: Remove player privileges
   ready:
