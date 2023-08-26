@@ -13,8 +13,12 @@ public interface IUserRepository {
     CompletableFuture<Collection<User>> getUsers();
 
     CompletableFuture<Collection<User>> getOverCubeUsers();
-
+    CompletableFuture<Integer> getOverCubeCount(UUID uuid);
     CompletableFuture<Boolean> getOverCubeReady(UUID uuid);
+
+    CompletableFuture<User> getSingleSpottedUser(UUID uuid);
+
+    CompletableFuture<Collection<User>> getSpottedUser();
 
     CompletableFuture<Integer> getReportCount(UUID uuid);
 
@@ -33,9 +37,5 @@ public interface IUserRepository {
     }
 
     CompletableFuture<Void> setOverCubeReady(UUID uuid, boolean allowed);
-
-    CompletableFuture<Collection<User>> getSpottedUsers();
-
-    CompletableFuture<Integer> getOverCubeCount(UUID uuid);
 }
 

@@ -24,11 +24,11 @@ public class SQLUserRepository implements IUserRepository {
 
     private User parseUserRow(RowData row) {
         return new User(
-            (UUID) row.get("uuid"),
-            row.getInt("report"),
-            row.getBoolean("is_over_cube"),
-            row.getInt("overcube_count"),
-            row.getBoolean("overcube_ready")
+                (UUID) row.get("uuid"),
+                row.getInt("report"),
+                row.getBoolean("is_over_cube"),
+                row.getInt("overcube_count"),
+                row.getBoolean("overcube_ready")
         );
     }
 
@@ -62,13 +62,13 @@ public class SQLUserRepository implements IUserRepository {
     @Override
     public CompletableFuture<Collection<User>> getUsers() {
         return databaseConnection
-            .sendQuery("SELECT * FROM users")
-            .thenApply(result -> result
-                .getRows()
-                .stream()
-                .map(this::parseUserRow)
-                .collect(Collectors.toList())
-            );
+                .sendQuery("SELECT * FROM users")
+                .thenApply(result -> result
+                        .getRows()
+                        .stream()
+                        .map(this::parseUserRow)
+                        .collect(Collectors.toList())
+                );
     }
 
     @Override
@@ -93,8 +93,8 @@ public class SQLUserRepository implements IUserRepository {
     @Override
     public CompletableFuture<Void> giveReport(UUID uuid) {
         return databaseConnection
-            .sendPreparedStatement("UPDATE users SET report = report+1 WHERE uuid = ?", singletonList(uuid))
-            .thenRun(DO_NOTHING);
+                .sendPreparedStatement("UPDATE users SET report = report+1 WHERE uuid = ?", singletonList(uuid))
+                .thenRun(DO_NOTHING);
     }
 
     @Override
@@ -105,7 +105,19 @@ public class SQLUserRepository implements IUserRepository {
     }
 
     @Override
-    public CompletableFuture<Collection<User>> getSpottedUsers() {
+    public CompletableFuture<User> getSingleSpottedUser(UUID uuid) {
+        return databaseConnection
+                .sendPreparedStatement("SELECT * FROM users WHERE report >= 5 AND uuid = ?", singletonList(uuid))
+                .thenApply(result -> result.getRows()
+                        .stream()
+                        .map(this::parseUserRow)
+                        .findFirst()
+                        .orElse(null)
+                );
+    }
+
+    @Override
+    public CompletableFuture<Collection<User>> getSpottedUser() {
         return databaseConnection
                 .sendQuery("SELECT * FROM users WHERE report >= 5")
                 .thenApply(result -> result
@@ -119,8 +131,8 @@ public class SQLUserRepository implements IUserRepository {
     @Override
     public CompletableFuture<Integer> getOverCubeCount(UUID uuid) {
         return databaseConnection
-            .sendPreparedStatement("SELECT overcube_count FROM users WHERE uuid = ?", singletonList(uuid))
-            .thenApply(result -> result.getRows().get(0).getInt("overcube_count"));
+                .sendPreparedStatement("SELECT overcube_count FROM users WHERE uuid = ?", singletonList(uuid))
+                .thenApply(result -> result.getRows().get(0).getInt("overcube_count"));
     }
 
     @Override
@@ -137,7 +149,8 @@ public class SQLUserRepository implements IUserRepository {
                 .thenRun(DO_NOTHING);
     }
 
-    private static final Runnable DO_NOTHING = () -> {};
+    private static final Runnable DO_NOTHING = () -> {
+    };
 
     public static SQLUserRepository openPostgres(String url, String database, String username, String password) {
         String finalUrl = url +
